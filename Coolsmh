@@ -1,0 +1,154 @@
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui") 
+
+-- Loading Screen GUI
+local loadingGui = Instance.new("ScreenGui")
+loadingGui.Name = "CustomLoadingScreen"
+loadingGui.IgnoreGuiInset = true
+loadingGui.ResetOnSpawn = false
+loadingGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+loadingGui.Parent = playerGui 
+
+-- Black background
+local blackBg = Instance.new("Frame", loadingGui)
+blackBg.Size = UDim2.new(1, 0, 1, 0)
+blackBg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+blackBg.BorderSizePixel = 0
+blackBg.ZIndex = 0 
+
+-- Background image
+local background = Instance.new("ImageLabel", loadingGui)
+background.Size = UDim2.new(1, 0, 1, 0)
+background.Image = "rbxassetid://15720148388"
+background.ImageTransparency = 0.2
+background.BackgroundTransparency = 1
+background.ScaleType = Enum.ScaleType.Crop
+background.ZIndex = 1 
+
+-- Animated "Loading Script" text
+local loadingText = Instance.new("TextLabel", loadingGui)
+loadingText.AnchorPoint = Vector2.new(0.5, 0.5)
+loadingText.Position = UDim2.new(0.5, 0, 0.3, 0)
+loadingText.Size = UDim2.new(0.8, 0, 0.1, 0)
+loadingText.Text = "Loading Script"
+loadingText.TextColor3 = Color3.fromRGB(0, 200, 255)
+loadingText.BackgroundTransparency = 1
+loadingText.TextScaled = true
+loadingText.Font = Enum.Font.FredokaOne
+loadingText.ZIndex = 3 
+
+-- Animate loading text (pulse)
+task.spawn(function()
+    while loadingGui.Parent do
+        TweenService:Create(loadingText, TweenInfo.new(0.6, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {TextTransparency = 0.2}):Play()
+        task.wait(0.6)
+        TweenService:Create(loadingText, TweenInfo.new(0.6, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {TextTransparency = 0}):Play()
+        task.wait(0.6)
+    end
+end) 
+
+-- Blue floating particles
+for i = 1, 30 do
+    local particle = Instance.new("Frame", loadingGui)
+    particle.Size = UDim2.new(0, math.random(5, 10), 0, math.random(5, 10))
+    particle.Position = UDim2.new(math.random(), 0, math.random(), 0)
+    particle.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+    particle.BackgroundTransparency = 0.3
+    particle.BorderSizePixel = 0
+    particle.ZIndex = 2 
+
+    local targetPos = particle.Position + UDim2.new(0, math.random(-100, 100), 0, math.random(-100, 100))
+    TweenService:Create(particle, TweenInfo.new(10, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {Position = targetPos}):Play()
+end 
+
+-- Loading bar setup
+local barFrame = Instance.new("Frame", loadingGui)
+barFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+barFrame.Position = UDim2.new(0.5, 0, 0.85, 0)
+barFrame.Size = UDim2.new(0.6, 0, 0.05, 0)
+barFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+barFrame.BorderSizePixel = 0
+barFrame.ZIndex = 3 
+
+local uicorner = Instance.new("UICorner", barFrame)
+uicorner.CornerRadius = UDim.new(0, 20) 
+
+local barFill = Instance.new("Frame", barFrame)
+barFill.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+barFill.Size = UDim2.new(0, 0, 1, 0)
+barFill.BorderSizePixel = 0
+barFill.ZIndex = 4 
+
+local fillCorner = Instance.new("UICorner", barFill)
+fillCorner.CornerRadius = UDim.new(0, 20) 
+
+local percentLabel = Instance.new("TextLabel", barFrame)
+percentLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+percentLabel.Position = UDim2.new(0.5, 0, 1.5, 0)
+percentLabel.Size = UDim2.new(1, 0, 1, 0)
+percentLabel.BackgroundTransparency = 1
+percentLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+percentLabel.Font = Enum.Font.GothamBold
+percentLabel.TextScaled = true
+percentLabel.ZIndex = 4
+percentLabel.Text = "0%" 
+
+local totalDuration = 60
+local steps = 100
+local stepDuration = totalDuration / steps 
+
+for i = 1, steps do
+    local percent = i
+    barFill:TweenSize(UDim2.new(percent / 100, 0, 1, 0), "Out", "Linear", stepDuration, true)
+    percentLabel.Text = percent .. "%"
+    task.wait(stepDuration)
+end 
+
+-- Fade out loading screen
+TweenService:Create(loadingGui, TweenInfo.new(1), {Transparency = 1}):Play()
+task.wait(1)
+loadingGui:Destroy() 
+
+-- Discord Copy GUI (from second script)
+local discordGui = Instance.new("ScreenGui", playerGui)
+discordGui.Name = "DiscordCopyGui"
+discordGui.ResetOnSpawn = false
+discordGui.IgnoreGuiInset = true 
+
+local copyButton = Instance.new("TextButton", discordGui)
+copyButton.Size = UDim2.new(0, 150, 0, 40)
+copyButton.Position = UDim2.new(0.5, -75, 0.5, -20)
+copyButton.Text = "Copy Discord Link"
+copyButton.Font = Enum.Font.GothamBold
+copyButton.TextSize = 14
+copyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+copyButton.BackgroundTransparency = 0
+copyButton.BorderSizePixel = 0 
+
+local corner2 = Instance.new("UICorner", copyButton)
+corner2.CornerRadius = UDim.new(0, 12) 
+
+-- Draggable button
+copyButton.Active = true
+copyButton.Draggable = true 
+
+-- Rainbow background effect
+task.spawn(function()
+    local t = 0
+    while copyButton.Parent do
+        local hue = math.abs(math.sin(t))
+        copyButton.BackgroundColor3 = Color3.fromHSV(hue, 1, 1)
+        t += 0.01
+        task.wait(0.03)
+    end
+end) 
+
+-- Clipboard copy functionality
+copyButton.MouseButton1Click:Connect(function()
+    setclipboard("https://discord.gg/TWKyB8ytsT") -- Ensure your Discord link is correct
+    copyButton.Text = "Copied!"
+    task.wait(1)
+    copyButton.Text = "Copy Discord Link"
+end)
